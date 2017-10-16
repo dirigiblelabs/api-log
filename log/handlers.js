@@ -9,7 +9,7 @@
  *******************************************************************************/
 
 /* eslint-env node, dirigible */
-var loggers = require('logger/v3/loggers');
-for(var propertyName in loggers) {
-	exports[propertyName] = loggers[propertyName];
+var handlers = require('log/v3/handlers');
+for(var propertyName in handlers) {
+	exports[propertyName] = handlers[propertyName];
 };

@@ -9,9 +9,9 @@
  *******************************************************************************/
 
 /* eslint-env node, dirigible */
-//var globals = require('core/globals');
-var handlers = require('logger/handlers').getHandlers();
-var LEVELS = exports.LEVELS = require('logger/levels').LEVELS;
+var globals = require('core/v3/globals');
+var handlers = require('log/handlers').getHandlers();
+var LEVELS = exports.LEVELS = require('log/levels').LEVELS;
 
 var Logger = exports.Logger = function(loggerName){
 	this.name = this.loggerName = loggerName;
@@ -20,17 +20,16 @@ var Logger = exports.Logger = function(loggerName){
 var _level;
 exports.setLevel = function(level){
 	_level = level;
+	globals.set('core.logging.root.level', ''+level)
 	return this;
-	//globals.set('core.logging.root.level', level);
 };
 
 exports.getLevel = function(){
-	return _level || LEVELS.OFF;
-	//return globals.get('core.logging.root.level') || LEVELS.OFF;
+	return _level || globals.get('core.logging.root.level') || LEVELS.OFF;
 };
 
 Logger.prototype.getHandlers = function(){
-	return require('logger/handlers').getHandlers();
+	return require('log/handlers').getHandlers();
 };
 
 Logger.prototype.log = function(message, level, err){

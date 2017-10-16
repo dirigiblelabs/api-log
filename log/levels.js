@@ -9,7 +9,7 @@
  *******************************************************************************/
 
 /* eslint-env node, dirigible */
-var formatters = require('logger/v3/formatters');
-for(var propertyName in formatters) {
-	exports[propertyName] = formatters[propertyName];
+var levels = require('log/v3/levels');
+for(var propertyName in levels) {
+	exports[propertyName] = levels[propertyName];
 };

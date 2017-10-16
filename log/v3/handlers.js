@@ -10,8 +10,8 @@
 
 /* eslint-env node, dirigible */
 (function(){
-var LEVELS = require('logger/levels').LEVELS;
-var formatters = require('logger/formatters').getFormatters();
+var LEVELS = require('log/levels').LEVELS;
+var formatters = require('log/formatters').getFormatters();
 var Handler = exports.Handler = function(formatter){
 	this.formatter = formatter;
 };
