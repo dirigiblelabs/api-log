@@ -54,26 +54,28 @@ Logger.prototype.log = function(message, level, err){
 			}		
 		}
 	}
+	return this;
 };
 
 Logger.prototype.error = function(message, error){
 	this.log(message, LEVELS.ERROR, error);
+	return this;
 };
 
 Logger.prototype.warn = function(message){
-	this.log(message, LEVELS.WARN);
+	return this.log(message, LEVELS.WARN);
 };
 
 Logger.prototype.info = function(message){
-	this.log(message, LEVELS.INFO);
+	return this.log(message, LEVELS.INFO);
 };
 
 Logger.prototype.debug = function(message){
-	this.log(message, LEVELS.DEBUG);
+	return this.log(message, LEVELS.DEBUG);
 };
 
 Logger.prototype.trace= function(message){
-	this.log(message, LEVELS.TRACE);
+	return this.log(message, LEVELS.TRACE);
 };
 
 exports.get = function(loggerName, level){
