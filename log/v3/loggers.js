@@ -17,15 +17,18 @@ var Logger = exports.Logger = function(loggerName){
 	this.name = this.loggerName = loggerName;
 };
 
-var _level;
-exports.setLevel = function(level){
-	_level = level;
-	globals.set('core.logging.root.level', ''+level)
+var logger_levels = {};
+
+exports.setLevel = function(level, loggerName){
+	if(!loggerName)
+		globals.set('core.logging.root.level', ''+level);
+	else
+		logger_levels[loggerName] = level;
 	return this;
 };
 
-exports.getLevel = function(){
-	return _level || globals.get('core.logging.root.level') || LEVELS.OFF;
+exports.getLevel = function(loggerName){
+	return logger_levels[loggerName] || globals.get('core.logging.root.level') || LEVELS.OFF;
 };
 
 Logger.prototype.getHandlers = function(){
@@ -33,7 +36,7 @@ Logger.prototype.getHandlers = function(){
 };
 
 Logger.prototype.log = function(message, level, err){
-	var loggerLevel = exports.getLevel(); 
+	var loggerLevel = exports.getLevel(this.loggerName); 
 	if(loggerLevel!==LEVELS.OFF && loggerLevel >= level){
 		var logRecord = {
 			loggerName	: this.loggerName || this.name || this.ctx,
@@ -77,12 +80,7 @@ Logger.prototype.trace= function(message){
 	return this.log(message, LEVELS.TRACE);
 };
 
-exports.get = function(loggerName, level){
-/*	var logger = globals.get(loggerName);
-	if(!logger){
-		logger = new Logger(loggerName, level);
-		globals.set(loggerName, logger);
-	}*/
-	var logger = new Logger(loggerName, level);
+exports.get = function(loggerName){
+	var logger = new Logger(loggerName);
 	return logger;
 };
