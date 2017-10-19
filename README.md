@@ -57,13 +57,9 @@ Handlers are usually initialized with some formatter that they will delegate to 
 
 ### Setup log handlers silent failure
 By default handlers will fail silently. Should you want to inspect errors in handlers enable the following setting `core/logging/handlers/handlers-fail-log`:  
-`require('core/v3/globals').set("core/logging/handlers/handlers-fail-log", "true");`
+`require('core/v3/globals').set("core/logging/handlers/handlers-fail-log", "true");`  
 
-## Customizations
-
-#### Log message formatters
-Log message formatters transform the log message object into a specific serializable form, usable by handlers.  
-
+## Class log/formatters/Formatter
 There is an out-of-the-box `Formatter` class supplied by the `log/formatters` module. Upon instantiation it looks up a globally configured log record template in `core/v3/globals` by the name `core/logging/formatters/log-record-template` and falls back to a default one if none is found. As much as this generic formatters is used and the log record template is shared among handlers you can customize this single configuratin setting to affect all if you wanted a different log message layout.  
 
 To inspect the current setting use:  
@@ -76,11 +72,6 @@ The Formatter class formats log record objects into strings using the template i
 
 Note that this formatter is designed to accept and format also dynamically provided paramters in addition to the standed log record ones. Any additional argument to its format method single required one (logRecord) will be appended with a single space prefix to the tail of the formatted log record string.
 
-To  customize further the formatting behavior, you can extend the Formatter class or create your own and ake sure it is used by the hanlders it is intended for.
-
-#### Log handlers
-Log handlers take care for formatting a log message using formatters and serializing it to a specific destination such as console or file.
-A console log handler comes out-of-the-box with the `log/handlers` module, logging messages in the server console.
 
 ## License
 
