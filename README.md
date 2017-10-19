@@ -37,14 +37,22 @@ Concrete logger log severity level settings ovverride the global ones.
 Logger levels are accessible via `core/v3/globals` by the key pattern `'core/logging/your-logger-name-here/level'` and `'core/logging/root/level'` for the global level respectively.
 
 ### Setup log message pattern
-Log messages are formatted by formatters. The default formatter uses `core/logging/formatters/log-record-template` setting available via the `core/v3/globals` module or falls back to default pattern `[{}] {} {}` if nothing found. The `{}` constructs are placeholders and their order is significant (currently). They will be replaced with the following log record properties in that order: `loggerName`, `message`, `error`. To change the template, update it:  
+Log messages are formatted by formatters. The default formatter uses `core/logging/formatters/log-record-template` setting available via the `core/v3/globals` module or falls back to default pattern `[{}] {} {}` if nothing found. 
+
+The `{}` constructs are placeholders and their order is significant (currently). They will be replaced with the following log record properties in that order: `loggerName`, `message`, `error`. 
+
+To change the template, update it:  
 `require("core/v3/globals").set("core/logging/formatters/log-record-template", "{}: {} {}");`  
+
 Currently, the template is global, i.e. the change will affect all loggers unless the formatter has been initialized explicitly wth a template string by some handler, which will effectively override the global setting.
 
 ### Setup handlers for logger
 Log handlers take care for formatting a log message using formatters and serializing it to a specific destination such as console or file. Besides the default global handler, whcih is `ConsoleHandler` supplied by `log/v3/handlers` module, a number of others can be preset, potentially per logger (name).  
+
 The mapping between logger names and coresponding handlers is maintained by the `core/v3/globals` module in namespace with the following pattern: `core/logging/handlers/your-logger-name-here`. The values stored in this path (if any) are in the form `path-to-module/handler-name`. For example, `log/handlers/CONSOLE`.  
+
 Other modules, different than `log/hanlders` can also provide handlers with this mechanism, provided that they expose also a `getHandler(sHandlerName)` function, which will take care to initialize and return a handler requested by its name.  
+
 Handlers are usually initialized with some formatter that they will delegate to for the formatting phase. It's quite possible that formatters are also shared and reused. They may override the global settings of the instances they use. For example the Console log handler uses its own specific global property (`core/logging/handlers/CONSOLE/formatter/log-record-template`) to configure template and only if it has not been preset, it falls back to the global one for setting up its formatter.
 
 ### Setup log handlers silent failure
@@ -55,14 +63,19 @@ By default handlers will fail silently. Should you want to inspect errors in han
 
 #### Log message formatters
 Log message formatters transform the log message object into a specific serializable form, usable by handlers.  
+
 There is an out-of-the-box `Formatter` class supplied by the `log/formatters` module. Upon instantiation it looks up a globally configured log record template in `core/v3/globals` by the name `core/logging/formatters/log-record-template` and falls back to a default one if none is found. As much as this generic formatters is used and the log record template is shared among handlers you can customize this single configuratin setting to affect all if you wanted a different log message layout.  
+
 To inspect the current setting use:  
 `require('core/v3/globals').get('core/logging/formatters/log-record-template')`  
+
 The Formatter class formats log record objects into strings using the template in its `format` method. The logRecord parameter has the following properties:  
 - loggerName: The name of the logger that requests logging
 - message: The message that this logger logs
 - error: optional parameter in case the logger logs an error. Nromally, this is the javacriot Error or Exception object and may feature stack and error message, but not necessarily  
+
 Note that this formatter is designed to accept and format also dynamically provided paramters in addition to the standed log record ones. Any additional argument to its format method single required one (logRecord) will be appended with a single space prefix to the tail of the formatted log record string.
+
 To  customize further the formatting behavior, you can extend the Formatter class or create your own and ake sure it is used by the hanlders it is intended for.
 
 #### Log handlers
