@@ -39,4 +39,18 @@ exports.getHandlers = function(){
 		new ConsoleHandler()
 	];
 };
+
+var HanlderErrorHandler = function(){
+	Handler.call(this);	
+}
+HanlderErrorHandler.prototype = Object.create(Handler.prototype);
+HanlderErrorHandler.prototype.handle = function(logRecord){
+	console.error(logRecord.message);
+	console.error(logRecord.error);
+	if(logRecord.error && logRecord.error.stack)
+		console.error(logRecord.error.stack);
+}
+
+exports.handlerErrorHandler = new HanlderErrorHandler();
+
 })(exports);
