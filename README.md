@@ -28,9 +28,12 @@ To set logger level, use any of the constants supplied by the `log/levels` with 
 or exposed by the enumeration object `LEVELS` in the same module:  
 `require('log/loggers').setLevel(require('log/levels').LEVELS.DEBUG, 'a/b/c');`  
 In these examples, the logger going by the name `a/b/c` is preset with logging level `DEBUG`. Trying to log with severity level `TRACE` will not have effect, while trying to log with severity level `INFO` will produce result.  
+
 To setup log severity levels globally just omit the second argument to setLevel:  
 `require('log/loggers').setLevel(require('log/levels').DEBUG);`  
+
 Concrete logger log severity level settings ovverride the global ones.
+
 Logger levels are accessible via `core/v3/globals` by the key pattern `'core/logging/your-logger-name-here/level'` and `'core/logging/root/level'` for the global level respectively.
 
 ### Setup log message pattern
