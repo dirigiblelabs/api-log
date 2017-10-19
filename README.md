@@ -22,44 +22,49 @@ If you do not supply a name, the global (root) logger will be returned:
 }</pre>
 
 ## Setup
-### Set logger severity level
+
+### Global configuration settings
+Te global configuration settings are maintained (currenlty) by the globals module (`core/v3/globals`) and are accessible via its set/get functions.  
+
+#### Severity levels
+The values of either of these settings must be a valid number coressponding to a severity level as provided by module `log/levels` `LEVELS`.  
+ - `core/logging/root/level`: the root (global) logging severity level. Effective for all loggers unless overriden by concrete logger setitng.  
+ - `core/logging/{logger-name}/level`: the logging severity level for a logger (name)  
+
+#### Log Hanlders
+ - `core/logging/handlers/handlers-fail-log`: indicates if hanlder intenral exceptions will be logged (`true`) or silently ignored (`false`)  
+ - `core/logging/handlers/{module-path:handler-name}`: Path to additional handler in the specified module (module-path) and with name (handler-name). Use it to configure custom handlers.
+ - `core/logging/handlers/CONSOLE/formatter/log-record-template`: formatter configuration for a specific log handler (CONSOLE). Log handlers can expose different sets of specific properties. This one will be used to override the default global log message template in the CONSOLE handler. Other handlers will be unaffected. 
+
+#### Log Formatters
+ - `core/logging/formatters/log-record-template`: the default log-record template that will be used to format log record objects into log message strings.  
+ - `core/logging/formatters/{module-path:formatter-name}`: Path to additional formatter in the specified module (module-path) and with name (formatter-name). Use it to configure custom formatters.   
+
+### Programmatic setup
+
+#### Set logger severity level
 To set logger level, use any of the constants supplied by the `log/levels` with the `setLevel` function:  
 `require('log/loggers').setLevel(require('log/levels').DEBUG, 'a/b/c');`  
 or exposed by the enumeration object `LEVELS` in the same module:  
-`require('log/loggers').setLevel(require('log/levels').LEVELS.DEBUG, 'a/b/c');`  
+`require('log/loggers').setLevel(require('log/levels').LEVELS.DEBUG, 'a/b/c');`
 In these examples, the logger going by the name `a/b/c` is preset with logging level `DEBUG`. Trying to log with severity level `TRACE` will not have effect, while trying to log with severity level `INFO` will produce result.  
 
 To setup log severity levels globally just omit the second argument to setLevel:  
 `require('log/loggers').setLevel(require('log/levels').DEBUG);`  
 
-Concrete logger log severity level settings ovverride the global ones.
+Concrete logger log severity level settings override the global ones.
 
-Logger levels are accessible via `core/v3/globals` by the key pattern `'core/logging/your-logger-name-here/level'` and `'core/logging/root/level'` for the global level respectively.
+#### Setup log message pattern
+Log messages are formatted by formatters. The default formatter supplied by `log/formatters` module uses a message template with placeholders, which are filled when format is request with concrete values. The placehoders are wlell-knwon strings surrounded by curly braces: `{}`. They will be replaced with the following log record properties: `loggerName`, `message`, `error` globally (i.e. multiple occurencies of the same pattern will be replaced with the corresponding values wherever found).  
+The standard method for application devleopers to update the tempalte would be configuration. Handler provider developers may also use API for that. A custom template can be programmatically injected in the Formatter instance with its `setLogRecordTemplate(sTemplate)` method or provided to its constructor function as argument: `new Formatter(sTemplate)`. Of course, that may or may not be irrelevant for custom formatters.
 
-### Setup log message pattern
-Log messages are formatted by formatters. The default formatter uses `core/logging/formatters/log-record-template` setting available via the `core/v3/globals` module or falls back to default pattern `[{}] {} {}` if nothing found. 
-
-The `{}` constructs are placeholders and their order is significant (currently). They will be replaced with the following log record properties in that order: `loggerName`, `message`, `error`. 
-
-To change the template, update it:  
-`require("core/v3/globals").set("core/logging/formatters/log-record-template", "{}: {} {}");`  
-
-Currently, the template is global, i.e. the change will affect all loggers unless the formatter has been initialized explicitly wth a template string by some handler, which will effectively override the global setting.
-
-### Setup handlers for logger
+#### Setup handlers for logger
 Log handlers take care for formatting a log message using formatters and serializing it to a specific destination such as console or file. Besides the default global handler, whcih is `ConsoleHandler` supplied by `log/v3/handlers` module, a number of others can be preset, potentially per logger (name).  
 
-The mapping between logger names and coresponding handlers is maintained by the `core/v3/globals` module in namespace with the following pattern: `core/logging/handlers/your-logger-name-here`. The values stored in this path (if any) are in the form `path-to-module/handler-name`. For example, `log/handlers/CONSOLE`.  
+Other modules, different than `log/hanlders` can also provide handlers with this mechanism, provided that they expose also a `getHandler(sHandlerName)` function, which will take care to initialize and return a handler requested by its name. The `getHandler(sName)` function in `log/handlers` module will take care to look them up and store for further reference. 
 
-Other modules, different than `log/hanlders` can also provide handlers with this mechanism, provided that they expose also a `getHandler(sHandlerName)` function, which will take care to initialize and return a handler requested by its name.  
-
-Handlers are usually initialized with some formatter that they will delegate to for the formatting phase. It's quite possible that formatters are also shared and reused. They may override the global settings of the instances they use. For example the Console log handler uses its own specific global property (`core/logging/handlers/CONSOLE/formatter/log-record-template`) to configure template and only if it has not been preset, it falls back to the global one for setting up its formatter.
-
-### Setup log handlers silent failure
-By default handlers will fail silently. Should you want to inspect errors in handlers enable the following setting `core/logging/handlers/handlers-fail-log`:  
-`require('core/v3/globals').set("core/logging/handlers/handlers-fail-log", "true");`  
-
-## Class log/formatters/Formatter
+## API 
+### Class log/formatters/Formatter
 There is an out-of-the-box `Formatter` class supplied by the `log/formatters` module. Upon instantiation it looks up a globally configured log record template in `core/v3/globals` by the name `core/logging/formatters/log-record-template` and falls back to a default one if none is found. As much as this generic formatters is used and the log record template is shared among handlers you can customize this single configuratin setting to affect all if you wanted a different log message layout.  
 
 To inspect the current setting use:  
