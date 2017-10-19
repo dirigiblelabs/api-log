@@ -55,7 +55,7 @@ Formatter.prototype.format = function(logRecord){
  * Returns a Formatter instance associated with the supplied name with defualt settings. 
  * If sName is not supplied the defualt Formatter will be instantiated.
  * Otherwise, the function will look up configured formatters in globals module ('core/v3/globals') by the name:
- * NS_FORMATTERS_CFG + '/' + formatterLookupString, where formatterLookupString is in the format path-to-module/formatter-name.
+ * NS_FORMATTERS_CFG + '/' + formatterLookupString, where formatterLookupString is in the format path-to-module:formatter-name.
  */
 exports.getFormatter = function(sName){
 	if(!sName)
@@ -63,9 +63,9 @@ exports.getFormatter = function(sName){
 	var _sFormatter = require('core/v3/globals').get(NS_FORMATTERS_CFG + '/' + sName);
 	var _oFormatter;
 	if(_sFormatter){
-		var _iSplitIdx = _sFormatter.lastIndexOf('/');
-		var _sModulePath = _sFormatter.substring(0, _iSplitIdx);
-		var _sFormatterName = _sFormatter.substring(_iSplitIdx+1, _sFormatter.length);
+		var _aModuleFormatter = _sFormatter.lastIndexOf(':');
+		var _sModulePath = _aModuleFormatter[0];
+		var _sFormatterName = _aModuleFormatter[0];
 		
 		if(!_sModulePath || _sModulePath === 'log/formatters')
 			return new Formatter();

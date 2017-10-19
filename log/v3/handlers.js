@@ -81,7 +81,7 @@ exports.getHandlers = function(sLoggerName){
 		return loggerHandlers[sLoggerName];
 	//Read or infer configured handlers for this logger
 	//TODO: namespace to core.logging prefix;
-	//handler info consists of "module-path/handler-name". Multiple can be encoded with ',' for separator
+	//handler info consists of "module-path:handler-name". Multiple can be encoded with ',' for separator
 	var _aHandlerNames = globals.get(NS_HANDLERS_CFG + '/' + sLoggerName); 
 	//TODO: tmp hardcoded. The above will always be undefined until configurable and injected at start
 	if(!_aHandlerNames){
@@ -90,9 +90,9 @@ exports.getHandlers = function(sLoggerName){
 	var _oHandlerRefs = {};
 	if(_aHandlerNames){
 		_aHandlerNames.split(',').forEach(function(sHandler){
-			var _iSplitIdx = sHandler.lastIndexOf('/');
-			var _sModulePath = sHandler.substring(0, _iSplitIdx);
-			var _sHandlerName = sHandler.substring(_iSplitIdx+1, sHandler.length);
+			var _aModuleHandler = sHandler.split(':');
+			var _sModulePath = _aModuleHandler[0];
+			var _sHandlerName = _aModuleHandler[1];
 			_oHandlerRefs[_sHandlerName] = _sModulePath;
 		}.bind(this));
 	}
