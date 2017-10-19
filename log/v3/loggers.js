@@ -13,7 +13,7 @@ var globals = require('core/v3/globals');
 var levels = require('log/levels');
 
 const NS = 'core.logging';
-const NS_ROOT = 'core.logging.root.level';
+const NS_ROOT = 'core/logging/root/level';
 
 var Logger = exports.Logger = function(loggerName){
 	this.loggerName = loggerName;
@@ -50,11 +50,11 @@ var getLevel = exports.getLevel = function(loggerName){
 };
 
 Logger.prototype.getHandlers = function(){
-	return require('log/handlers').getHandlers();
+	return require('log/handlers').getHandlers(this.loggerName);
 };
 
 var isLogging = function(sLoggerName, nLevel){
-	var _nLoggerLevel = getLevel(sLoggerName); 
+	var _nLoggerLevel = getLevel(sLoggerName);
 	return _nLoggerLevel!==levels.OFF && _nLoggerLevel >= nLevel;
 }
 
@@ -62,34 +62,27 @@ Logger.prototype.isLogging = function(nLevel){
 	return isLogging(this.loggerName, nLevel);
 };
 
-var handlers = require('log/handlers').getHandlers();
+var errHandler = new (require('log/handlers')).Handler();
 Logger.prototype.log = function(sMessage, nLevel, err){
-	if(this.isLogging(nLevel)){ 
+	if(this.isLogging(nLevel)){
 		var logRecord = {
 			loggerName	: this.loggerName,
 			message		: sMessage,
 			level		: nLevel,
 			error		: err
 		};
-		if(handlers){
-			for(var i = 0; i < handlers.length; i++){
+		var _aHandlers = this.getHandlers();
+		if(_aHandlers){
+			for(var i = 0; i < _aHandlers.length; i++){
 				try {
-					handlers[i].handle(logRecord);
+					_aHandlers[i].handle(logRecord);
 				} catch(handlingError) {
-					var handlerErrorHandler = require('log/handlers').handlerErrorHandler;
-					if(handlerErrorHandler){
-						try{
-							handlerErrorHandler.handle({
-								"message": "An exception occured in log handler",
-								"error": handlingError
-							});
-						} catch(err) {
-							console.error('Errors handler failed. Falling back to console.');
-							//last resort
-							console.error(handlingError);
-							console.trace(handlingError.stack);							
-						}
-					}
+					try{
+						if(_aHandlers[i].fail)
+							_aHandlers[i].fail(handlingError);
+						else
+							errHandler.fail(handlingError);						
+					} catch (err){}
 				}
 			}		
 		}
