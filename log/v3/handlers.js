@@ -12,6 +12,7 @@
 (function(){
 
 const NS_HANDLERS_CFG = 'core/logging/handlers';
+exports.NS_HANDLERS_CFG = NS_HANDLERS_CFG;
 var globals = require('core/v3/globals');
 var Formatter = require('log/formatters').Formatter;
 
@@ -50,7 +51,7 @@ var ConsoleHandler = function(oFormatter){
 ConsoleHandler.prototype = Object.create(Handler.prototype);
 
 ConsoleHandler.prototype.handle = function(logRecord){
-	var message = this.oFormatter.format(logRecord);
+	var message = this.oFormatter.format(logRecord);	
 	console[this.levelToConsoleMethodMap[logRecord.level]](message);
 	if(logRecord.error && logRecord.error.stack)
 		console.error(logRecord.error.stack);

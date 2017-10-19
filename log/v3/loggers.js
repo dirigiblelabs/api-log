@@ -12,12 +12,10 @@
 var globals = require('core/v3/globals');
 var levels = require('log/levels');
 
-const NS = 'core.logging';
-const NS_ROOT = 'core/logging/root/level';
-
-var Logger = exports.Logger = function(loggerName){
-	this.loggerName = loggerName;
-};
+const NS = 'core/logging';
+exports.NS = NS;
+const NS_ROOT = 'core/logging/root';
+exports.NS_ROOT = NS_ROOT;
 
 exports.setLevel = function(level, loggerName){
 	//if the level argument is level name ('ERROR', 'WARN', etc.) convert it to  its ordinal integer value
@@ -28,9 +26,9 @@ exports.setLevel = function(level, loggerName){
 		levels.valueOf(level);
 	}
 	if(!loggerName)
-		globals.set(NS_ROOT, ''+level);
+		globals.set(NS_ROOT + '/level', ''+level);
 	else {
-		globals.set(NS + "." + loggerName, ''+level);
+		globals.set(NS + "/" + loggerName + '/level', ''+level);
 	}
 	return this;
 };
@@ -41,12 +39,19 @@ exports.setLevel = function(level, loggerName){
 var getLevel = exports.getLevel = function(loggerName){
 	if(!loggerName)
 		loggerName = NS_ROOT;
-	var level = globals.get(loggerName);
+	else
+		loggerName = NS+'/'+loggerName;
+	var path = loggerName + '/level';
+	var level = globals.get(path);
 	if(level === null)
-		level = globals.get(NS_ROOT);
+		level = globals.get(NS_ROOT + '/level');
 	if(level === null)
 		level = levels.OFF;
 	return level;
+};
+
+var Logger = exports.Logger = function(loggerName){
+	this.loggerName = loggerName;
 };
 
 Logger.prototype.getHandlers = function(){
@@ -54,7 +59,7 @@ Logger.prototype.getHandlers = function(){
 };
 
 var isLogging = function(sLoggerName, nLevel){
-	var _nLoggerLevel = getLevel(sLoggerName);
+	var _nLoggerLevel = this.getLevel();
 	return _nLoggerLevel!==levels.OFF && _nLoggerLevel >= nLevel;
 }
 
@@ -111,9 +116,21 @@ Logger.prototype.trace= function(message){
 	return this.log(message, levels.TRACE);
 };
 
+Logger.prototype.getLevel= function(){
+	return getLevel(this.loggerName);
+};
+
+Logger.prototype.setLevel= function(level){
+	return setLevel(level, this.loggerName);
+};
+
 //maintain loggername to logger instance mapping and reuse instances
 var loggers = {};
 
+/**
+ * Get or create a Logger instance for this loggerName string.
+ * For reference, the root's logger name is '__root__'.
+ */
 exports.get = exports.getLogger = function(loggerName){
 	var _loggerName = loggerName || '__root__';
 	if(loggers[_loggerName]!== undefined){
