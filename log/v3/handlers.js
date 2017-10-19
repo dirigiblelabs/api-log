@@ -85,7 +85,7 @@ exports.getHandlers = function(sLoggerName){
 	var _aHandlerNames = globals.get(NS_HANDLERS_CFG + '/' + sLoggerName); 
 	//TODO: tmp hardcoded. The above will always be undefined until configurable and injected at start
 	if(!_aHandlerNames){
-		_aHandlerNames = "log/handlers/CONSOLE";
+		_aHandlerNames = "log/handlers:CONSOLE";
 	}
 	var _oHandlerRefs = {};
 	if(_aHandlerNames){
@@ -108,7 +108,7 @@ exports.getHandlers = function(sLoggerName){
 		}
 		if(_oHandlerModule){
 			if(_oHandlerModule.getHandler && typeof _oHandlerModule.getHandler === 'function'){
-				_oHandler = _oHandlerModule.getHandler(_sHandlerName);
+				var _oHandler = _oHandlerModule.getHandler(_sHandlerName);
 				if(_oHandler)
 					_aHandlers.push(_oHandler);
 			}
