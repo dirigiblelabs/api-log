@@ -9,7 +9,8 @@
  *******************************************************************************/
 
 /* eslint-env node, dirigible */
-var levels = require('log/v3/levels');
-for(var propertyName in levels) {
-	exports[propertyName] = levels[propertyName];
-};
+
+var log = require('log/v3/logging');
+for(var propertyName in log) {
+	exports[propertyName] = log[propertyName];
+}
