@@ -38,7 +38,7 @@ org.eclipse.dirigible.api.v3.log.JSServiceException: I am an error
 ## Use
 
 #### Get logger for name
-`var logger = require('log/loggers').getLogger('a.b.c');`
+`var logger = require('log/logging').getLogger('a.b.c');`
 
 #### Simple logging
 `logger.info('Sample info message');`  
